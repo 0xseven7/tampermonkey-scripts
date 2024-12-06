@@ -29,10 +29,15 @@ window.onload = function main() {
     }
     running = true
     prevToken = token
-
+    removeFilter()
+    removeEle('/html/body/div[1]/nav/div[1]/div[2]')
+      .catch(logger.error.bind(logger))
+      .finally(() => (running = false))
+    resizeChart().then().catch()
     addExternalLinks(token)
       .catch(logger.error.bind(logger))
       .finally(() => (running = false))
+    clickTrade().then().catch()
   }
 
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true })
@@ -42,22 +47,15 @@ async function addExternalLinks(token: string) {
   const threadEl = await HTMLUtils.query(() =>
     HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="thread"]')
   )
-
   const divWrapEl = document.createElement('div')
   divWrapEl.classList.add('flex', 'gap-2', 'text-green-300', 'ml-auto')
 
   divWrapEl.appendChild(
-    createExternalLink('dexscreener', `https://dexscreener.com/solana/${token}`)
+    createExternalLink('xsearch', `https://x.com/search?q=${token}&src=typed_query`)
   )
   divWrapEl.appendChild(createExternalLink('gmgn', `https://gmgn.ai/sol/token/${token}`))
   divWrapEl.appendChild(
     createExternalLink('photon', `https://photon-sol.tinyastro.io/en/lp/${token}`)
-  )
-  divWrapEl.appendChild(
-    createExternalLink(
-      'raydium',
-      `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token}&inputMint=sol&outputMint=${token}`
-    )
   )
   threadEl.parentElement?.appendChild(divWrapEl)
 }
@@ -68,4 +66,32 @@ function createExternalLink(text: string, href: string) {
   el.setAttribute('target', '_blank')
   el.innerText = text
   return el
+}
+
+async function removeEle(path: string) {
+  const headTokenEle = await HTMLUtils.query(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>(path)
+  )
+  headTokenEle.remove()
+}
+async function resizeChart() {
+  const chartEle = await HTMLUtils.query(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[starts-with(@id,"tv-chart")]')
+  )
+  chartEle.setAttribute('style', 'height: 400px')
+}
+
+async function clickTrade() {
+  const tradeEle = await HTMLUtils.query(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('//div[text()="trades"]')
+  )
+  console.log('zxxx', tradeEle)
+  tradeEle.click()
+}
+async function removeFilter() {
+  const bodyEle = await HTMLUtils.query(() =>
+    HTMLUtils.getFirstElementByXPath<HTMLDivElement>('/html/body')
+  )
+  bodyEle.setAttribute("style","width:80%")
+  console.log('bodyEle', bodyEle)
 }

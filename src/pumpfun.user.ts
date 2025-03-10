@@ -16,12 +16,10 @@
 
 import { HTMLUtils, Logger } from './util'
 const logger = Logger.new('Better pump.fun')
-console.log('badbadbad')
 window.onload = function main() {
 
   let running = false
   let prevToken = ''
-
   const run = () => {
   playSellAudio()
     const token = location.pathname.split('/').pop()!
